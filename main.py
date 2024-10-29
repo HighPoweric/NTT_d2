@@ -32,5 +32,6 @@ while True:
 
 ########## END ###################
 print('''##################################
-#### Obrigado por usar nossos Serviços ####
+####### Obrigado por usar ########
+####### nossos Serviços!  ########
 ##################################''')
