@@ -1,5 +1,6 @@
 import parameters
 from datetime import datetime
+from decimal import Decimal, ROUND_DOWN
 
 class ContaBancaria:
     def __init__(self):
@@ -16,7 +17,8 @@ class ContaBancaria:
         while True:
             try:
                 print("indique um valor para deposito ou digite 0 para cancelar")
-                valor = int(float(input("R$ ")) * 100)/100 #metodo patenteado do Eric para truncar em duas casas decimais
+                #Obtendo o valor arredondando para baixo em duas casas decimais
+                valor = Decimal(input("R$ ")).quantize(Decimal('0.01'), rounding=ROUND_DOWN) 
             except ValueError: #valor nao numerico
                 print('Por favor digite um valor numérico válido')
                 continue
@@ -45,7 +47,8 @@ class ContaBancaria:
         while True:
             try:                
                 print("indique um valor para Saque ou digite 0 para cancelar")
-                valor = int(float(input("R$ ")) * 100)/100 #metodo patenteado do Eric para truncar em duas casas decimais
+                #Obtendo o valor arredondando para baixo em duas casas decimais
+                valor = Decimal(input("R$ ")).quantize(Decimal('0.01'), rounding=ROUND_DOWN) 
             except ValueError: #valor nao numerico
                 print('Por favor digite um valor numérico válido')
                 continue
@@ -61,7 +64,7 @@ class ContaBancaria:
                 print(f'Valor acima do seu limite de saque de R${parameters.LIMITE_VALOR_SAQUE}')
                 continue
             #Verificando saldo para saque
-            elif parameters.BOL_SAQUE_ALEM_SALDO and valor > self.saldo:
+            elif not parameters.BOL_SAQUE_ALEM_SALDO and valor > self.saldo:
                 print("O valor do saque não pode superar seu saldo.")
                 continue
 
