@@ -11,3 +11,5 @@ LIMITE_QUANT_SAQUE = 3
 ## Permitir Saques que negativem Saldo (emprestimo) 0 = Não, 1 = Sim
 BOL_SAQUE_ALEM_SALDO = 0
 
+## Limite de transacoes por dia
+LIMITE_TRANS_DIA = 10

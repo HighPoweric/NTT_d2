@@ -6,7 +6,7 @@ class ContaBancaria:
     def __init__(self):
         self.saques_efetuados = 0
         self.saldo = 0
-        self.transacoes = [] #lista que vai conter um dic com a data e valor da transacao
+        self.transacoes = {} #dicionario que vai conter uma lista com dic de cada transacao {fecha [{trans 1}, {trans 2},... {trans n}]}
         self.opcoes = {
             'D': self.deposito,
             'S': self.saque,
@@ -14,6 +14,10 @@ class ContaBancaria:
         }
 
     def deposito (self):
+        #saimos se não tem mais transações restantes
+        if not self.transacoes_restantes():
+            print("Limite de transações diarias alcançado!")
+            return
         while True:
             try:
                 print("indique um valor para deposito ou digite 0 para cancelar")
@@ -30,7 +34,7 @@ class ContaBancaria:
                 break
             #atualizando saldo e registrando a transacao
             self.saldo += valor 
-            self.transacoes.append({
+            self.transacoes.setdefault(datetime.now().date(), []).append({
                 'data': datetime.now().isoformat(timespec='seconds'),
                 'tipo':'deposito',
                 'valor': valor
@@ -39,6 +43,10 @@ class ContaBancaria:
             break
 
     def saque (self):
+        #saimos se não tem mais transações restantes
+        if not self.transacoes_restantes():
+            print("Limite de transações diarias alcançado!")
+            return
         saques_restantes = self.saques_restantes()
         print(f"Seu saldo é de R${self.saldo} você tem {saques_restantes} saques restantes hoje")
         #saimos se não tem mais saques restantes
@@ -71,7 +79,7 @@ class ContaBancaria:
             #atualizando saldo, quantidade de saques e registrando a transacao
             self.saldo -= valor
             self.saques_efetuados += 1
-            self.transacoes.append({
+            self.transacoes.setdefault(datetime.now().date(), []).append({
                 'data': datetime.now().isoformat(timespec='seconds'),
                 'tipo':'saque',
                 'valor': valor
@@ -87,15 +95,20 @@ class ContaBancaria:
         total_saques = 0
         print("Extrato Bancario:")
         #percorremos nossa lista de transacoes
-        for transacao in self.transacoes:
-            if transacao['tipo'] == 'deposito':
-                print(f"{transacao['data']}, Depósito: R${transacao['valor']}")
-                total_depositado += transacao['valor']
-            elif transacao['tipo'] == 'saque': #saque
-                print(f"{transacao['data']}, Saque: -R${transacao['valor']}")
-                total_saques += transacao['valor']
+        for data, transacoes_data in self.transacoes.items():
+            print(f"Data: {data}")
+            for transacao in transacoes_data:
+                if transacao['tipo'] == 'deposito':
+                    print(f"{transacao['data']}, Depósito: R${transacao['valor']}")
+                    total_depositado += transacao['valor']
+                elif transacao['tipo'] == 'saque': #saque
+                    print(f"{transacao['data']}, Saque: -R${transacao['valor']}")
+                    total_saques += transacao['valor']
         print(f"Saldo final: R${self.saldo} - Total depositado: R${total_depositado} - Total retirado: R${total_saques}")
 
 
     def saques_restantes(self):
         return parameters.LIMITE_QUANT_SAQUE - self.saques_efetuados
+    
+    def transacoes_restantes(self): #retorna quantos transacoes restantes faltan ou 0 (False) se não tiver nenhuma restante
+        return parameters.LIMITE_TRANS_DIA - len(self.transacoes.get(datetime.now().date(), []))
